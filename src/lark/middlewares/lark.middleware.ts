@@ -20,9 +20,9 @@ class LarkMiddleware implements NestMiddleware {
   public getEventHandles = (): lark.EventHandles => ({
     'application.bot.menu_v6': async (data) => {
       const unionId = data.operator.operator_id.union_id;
-      this.cacheManager.del(`union_id_${unionId}`);
+      await this.cacheManager.del(`union_id_${unionId}`);
 
-      this.larkService.sendMessage(unionId, '清除成功', 'union_id');
+      await this.larkService.sendMessage(unionId, '清除成功', 'union_id');
     },
     'im.message.receive_v1': async (data) => {
       const chatId = data.message.chat_id;
@@ -35,7 +35,7 @@ class LarkMiddleware implements NestMiddleware {
         data.message.message_type !== 'text' &&
         data.message.message_type !== 'post'
       ) {
-        this.larkService.sendMessage(chatId, '暂不支持此类消息');
+        await this.larkService.sendMessage(chatId, '暂不支持此类消息');
 
         return;
       }
@@ -72,16 +72,19 @@ class LarkMiddleware implements NestMiddleware {
             1000 * 60 * 60 * 8,
           ); // save messages to redis
 
-          this.larkService.replyMessage(messageId, reply.content);
+          await this.larkService.replyMessage(messageId, reply.content);
         })
-        .catch((e) => {
+        .catch(async (e) => {
           console.log(e);
-          this.larkService.replyMessage(messageId, '系统请求过多，请稍后重试');
+          await this.larkService.replyMessage(
+            messageId,
+            '系统请求过多，请稍后重试',
+          );
         });
     },
   });
 
-  use(req: any, res: any) {
+  async use(req: any, res: any) {
     const encryptKey = this.configService.get('FEISHU_ENCRYPT_KEY');
 
     const eventDispatcher = new lark.EventDispatcher({
@@ -92,7 +95,7 @@ class LarkMiddleware implements NestMiddleware {
       autoChallenge: true,
     });
 
-    adaptor(req, res);
+    await adaptor(req, res);
   }
 }
 

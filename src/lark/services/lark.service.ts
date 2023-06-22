@@ -39,63 +39,63 @@ class LarkService {
     const bs = createHash('sha1').update(b1).digest();
     const sig = bs.toString('hex');
 
-    if (sig == signature) {
-      switch (body?.action?.value?.type) {
-        case 'clear':
-          this.cacheManager.reset();
-
-          return {
-            config: {
-              wide_screen_mode: true,
-            },
-            elements: [
-              {
-                tag: 'note',
-                elements: [
-                  {
-                    tag: 'img',
-                    img_key: 'img_v2_041b28e3-5680-48c2-9af2-497ace79333g',
-                    alt: {
-                      tag: 'plain_text',
-                      content: '',
-                    },
-                  },
-                  {
-                    tag: 'plain_text',
-                    content: '该消息由AI生成',
-                  },
-                ],
-              },
-              {
-                tag: 'hr',
-              },
-              {
-                tag: 'markdown',
-                content: '*已经清除上下文，你可以重新问我问题了*',
-              },
-              {
-                tag: 'action',
-                actions: [
-                  {
-                    tag: 'button',
-                    text: {
-                      tag: 'plain_text',
-                      content: '清空上下文',
-                    },
-                    type: 'danger',
-                    value: {
-                      type: 'clear',
-                    },
-                  },
-                ],
-              },
-            ],
-          };
-        default:
-          return bs.toString();
-      }
-    } else {
+    if (sig != signature) {
       return 'fail';
+    }
+
+    switch (body?.action?.value?.type) {
+      case 'clear':
+        this.cacheManager.reset();
+
+        return {
+          config: {
+            wide_screen_mode: true,
+          },
+          elements: [
+            {
+              tag: 'note',
+              elements: [
+                {
+                  tag: 'img',
+                  img_key: 'img_v2_041b28e3-5680-48c2-9af2-497ace79333g',
+                  alt: {
+                    tag: 'plain_text',
+                    content: '',
+                  },
+                },
+                {
+                  tag: 'plain_text',
+                  content: '该消息由AI生成',
+                },
+              ],
+            },
+            {
+              tag: 'hr',
+            },
+            {
+              tag: 'markdown',
+              content: '*已经清除上下文，你可以重新问我问题了*',
+            },
+            {
+              tag: 'action',
+              actions: [
+                {
+                  tag: 'button',
+                  text: {
+                    tag: 'plain_text',
+                    content: '清空上下文',
+                  },
+                  type: 'danger',
+                  value: {
+                    type: 'clear',
+                  },
+                },
+              ],
+            },
+          ],
+        };
+      default:
+        return bs.toString();
     }
   }
 
@@ -145,7 +145,7 @@ class LarkService {
 
     console.log('message', message);
 
-    return await this.client.im.message.reply(message);
+    return this.client.im.message.reply(message);
   };
 }
 

@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import type { ChatCompletionRequestMessage } from 'openai';
+import type {
+  ChatCompletionRequestMessage,
+  CreateChatCompletionResponse,
+} from 'openai';
 import { Configuration, OpenAIApi } from 'openai';
 import { ConfigService } from '@nestjs/config';
 import { AxiosResponse } from 'axios';
@@ -15,7 +18,9 @@ class OpenaiService {
     this.openai = new OpenAIApi(configuration);
   }
 
-  createChatCompletion(messages: ChatCompletionRequestMessage[]) {
+  createChatCompletion(
+    messages: ChatCompletionRequestMessage[],
+  ): Promise<AxiosResponse<CreateChatCompletionResponse, any>> {
     return this.openai.createChatCompletion({
       model: 'gpt-3.5-turbo',
       messages,
